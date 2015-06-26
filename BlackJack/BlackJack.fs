@@ -13,8 +13,41 @@ type Rank =
     | Jack
     | Value of int
 
-type Card = Card of Rank * Suit
+type Card = 
+    Card of Rank * Suit
 
+type Hand(cards : List<Card>) =
+    member h.Cards = cards
+
+let cardValue (Card(r,s)) =
+    match r with
+    | Ace -> (1,11)
+    | King | Queen | Jack -> (10,10)
+    | Value v -> (v,v) 
+
+let handValue (hand : Hand) =
+    hand.Cards
+    |> List.map cardValue
+    
+let handMinOrMax (isMax : bool) (hand:Hand) =
+    let handValue =
+         hand
+         |> handValue
+    match isMax with
+    | true -> 
+        handValue
+        |> List.map snd
+        |> List.sum
+    | false ->
+        handValue
+        |> List.map fst
+        |> List.sum
+
+handMinOrMax true (Hand([Card(Ace,Diamond);Card(Queen,Heart)]))
+handMinOrMax false (Hand([Card(Ace,Diamond);Card(Queen,Heart)]))
+
+Hand([Card(Ace,Diamond);Card(Queen,Heart)])
+        
 
 let DeckOfCards = 
     [ 
@@ -24,14 +57,17 @@ let DeckOfCards =
             for v in 2..10 do
                 yield Card(Value v, s) 
     ]
+
 let shuffle cards = 
     let rand = new System.Random()
     cards 
         |> List.map (fun c -> (rand.Next(), c))
         |> List.sortBy fst
         |> List.map snd
-
+ 
 let ShuffledCards = shuffle DeckOfCards
+type Dealer =
+    member d.name = "Dealer"
 
 type Player(name: string) = 
     let Name: string = name;
